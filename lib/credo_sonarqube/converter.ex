@@ -98,4 +98,5 @@ defmodule CredoSonarqube.Converter do
     def get_details(Credo.Check.Warning.MapGetUnsafePass), do: {@code_smell, @minor, @trivial}
     def get_details(Credo.Check.Warning.UnsafeToAtom), do: {@vulnerability, @major, @medium}
     def get_details(Credo.Check.Warning.LeakyEnvironment), do: {@vulnerability, @minor, @trivial}
+    def get_details(_unknown), do: {@code_smell, @minor, @trivial}
   end
