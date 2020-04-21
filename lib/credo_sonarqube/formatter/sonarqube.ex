@@ -29,22 +29,25 @@ defmodule CredoSonarqube.Formatter.Sonarqube do
 
     {type, severity, effort} = Converter.get_details(check)
 
-    column_end =
+    start_line = issue.line_no
+    columns =
       if issue.column && issue.trigger do
-        _ = issue.column + String.length(to_string(issue.trigger))
+        start_column = issue.column - 1
+        end_column = start_column + String.length(to_string(issue.trigger))
+        {start_column, end_column}
       end
 
     text_range =
-      if is_nil(column_end) do
-        %{"startLine" => issue.line_no}
-      else
-        %{
-          "startLine" => issue.line_no,
-          "startColumn" => issue.column,
-          "endColumn" => column_end,
-          "endLine" => issue.line_no
-        }
-      end
+      case columns do
+        nil -> %{"startLine" => start_line}
+        {start_column, end_column} ->
+          %{
+            "startLine" => start_line,
+            "startColumn" => start_column,
+            "endLine" => start_line,
+            "endColumn" => end_column
+          }
+        end
 
     %{
       "engineId" => "credo",
