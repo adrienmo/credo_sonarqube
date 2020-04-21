@@ -18,8 +18,9 @@ defmodule CredoSonarqube.Formatter.Sonarqube do
            category: _category,
            message: message,
            filename: filename,
-           priority: _priority
-         } = issue,
+           priority: _priority,
+           line_no: start_line
+         },
          base_folder
        ) do
     check_name =
@@ -28,26 +29,6 @@ defmodule CredoSonarqube.Formatter.Sonarqube do
       |> String.replace(~r/^(Elixir\.)/, "")
 
     {type, severity, effort} = Converter.get_details(check)
-
-    start_line = issue.line_no
-    columns =
-      if issue.column && issue.trigger do
-        start_column = issue.column - 1
-        end_column = start_column + String.length(to_string(issue.trigger))
-        {start_column, end_column}
-      end
-
-    text_range =
-      case columns do
-        nil -> %{"startLine" => start_line}
-        {start_column, end_column} ->
-          %{
-            "startLine" => start_line,
-            "startColumn" => start_column,
-            "endLine" => start_line,
-            "endColumn" => end_column
-          }
-        end
 
     %{
       "engineId" => "credo",
@@ -58,7 +39,8 @@ defmodule CredoSonarqube.Formatter.Sonarqube do
       "primaryLocation" => %{
         "message" => message,
         "filePath" => base_folder <> to_string(filename),
-        "textRange" => text_range
+        # Credo do not provide enough information for extended textRange
+        "textRange" => %{"startLine" => start_line}
       }
     }
   end
