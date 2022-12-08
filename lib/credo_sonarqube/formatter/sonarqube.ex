@@ -40,7 +40,7 @@ defmodule CredoSonarqube.Formatter.Sonarqube do
         "message" => message,
         "filePath" => base_folder <> to_string(filename),
         # Credo do not provide enough information for extended textRange
-        "textRange" => %{"startLine" => start_line}
+        "textRange" => %{"startLine" => start_line || 1}
       }
     }
   end
